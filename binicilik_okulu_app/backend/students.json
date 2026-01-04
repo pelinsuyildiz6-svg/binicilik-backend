@@ -1,0 +1,26 @@
+[
+    {
+        "ad_soyad": "mert",
+        "veli_telefon": "1231232323",
+        "sinif": "12",
+        "at_bilgisi": "selahattin",
+        "ucret_turu": "ucAylik",
+        "odenen_tutar": 1500.0,
+        "ogretmen": "Giriş Yapan Öğretmen",
+        "kayit_zamani": "2025-12-28T14:59:29.472",
+        "tarih": "2025-12-28",
+        "saat": "18:00"
+    },
+    {
+        "ad_soyad": "nehir",
+        "veli_telefon": "5522621112",
+        "sinif": "12",
+        "at_bilgisi": "selahattin",
+        "ucret_turu": "ucAylik",
+        "odenen_tutar": 1500.0,
+        "ogretmen": "Giriş Yapan Öğretmen",
+        "kayit_zamani": "2025-12-31T01:50:33.178220",
+        "tarih": "2025-12-31",
+        "saat": "01:48"
+    }
+]

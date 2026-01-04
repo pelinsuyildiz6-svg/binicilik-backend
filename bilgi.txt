@@ -1,0 +1,5 @@
+bir tane daha özellik eklenecek bu özellik 
+öğrenciye ücret ödemesini hatırlatacak ve öğrencinin telefonuna whastsapp üzerinden mesaj atacak
+bir bildirim simgesi oluşturacağız öğrenci detayları sekmesinde 
+bu bildirim simgesine basınca öğrenciye mesaj yollamaya başlayacağız. 
+apk uygulamasını yükleyip test etme.
