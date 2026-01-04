@@ -39,7 +39,7 @@ class _StudentRegistrationScreenState extends State<StudentRegistrationScreen> {
 
   // API adresi
   final String apiUrl =
-      'https://web-production-73831.up.railway.app/api/students/register';
+      'https://binicilik-backend.onrender.com/api/students/register';
 
   @override
   void dispose() {

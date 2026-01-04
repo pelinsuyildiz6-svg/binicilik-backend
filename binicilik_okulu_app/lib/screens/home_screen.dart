@@ -30,11 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<DateTime, List<String>> _events = {};
 
   // API adresi (Güncel IP ve PORT: 192.168.1.5:5000)
-  final String _apiUrl =
-      'https://web-production-73831.up.railway.app/api/students';
-  final String _apiBaseUrl =
-      'https://web-production-73831.up.railway.app/api/students/'; // Detay ekranı için
+  final String _apiUrl = 'https://binicilik-backend.onrender.com/api/students';
 
+  final String _apiBaseUrl =
+      'https://binicilik-backend.onrender.com/api/students/';
   @override
   void initState() {
     super.initState();

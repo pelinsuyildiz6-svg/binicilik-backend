@@ -41,7 +41,6 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
       _error = '';
     });
 
-    // API adresi: https://web-production-73831.up.railway.app/api/students/INDEX
     final url = Uri.parse('${widget.apiUrlBase}${widget.studentIndex}');
 
     try {

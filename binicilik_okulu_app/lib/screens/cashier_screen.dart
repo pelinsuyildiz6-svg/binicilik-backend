@@ -12,23 +12,21 @@ class CashierScreen extends StatefulWidget {
 }
 
 class _CashierScreenState extends State<CashierScreen> {
-  // Kasa toplamını tutacak değişken
   double _totalCash = 0.0;
   bool _isLoading = true;
   String _errorMessage = '';
 
-  // API adresini (Flask'ın çalıştığı yer) ayarlayın
-  // NOT: Eğer emülatör kullanıyorsanız genellikle 10.0.2.2 kullanılır.
-  // Gerçek cihazda veya farklı bir ağda ise bilgisayarınızın IP adresini kullanın (örn: 192.168.1.5:5000).
+  // GÜNCELLENEN URL: Render üzerindeki canlı adresin
+  // Toplam kasa bilgisi genellikle /api/cashier/total ucundan gelir.
   final String _apiUrl =
-      'https://web-production-73831.up.railway.app/api/total-cash';
+      'https://binicilik-backend.onrender.com/api/cashier/total';
+
   @override
   void initState() {
     super.initState();
     _fetchTotalCash();
   }
 
-  // API'den toplam kasayı çeken fonksiyon
   Future<void> _fetchTotalCash() async {
     setState(() {
       _isLoading = true;
@@ -41,18 +39,19 @@ class _CashierScreenState extends State<CashierScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          _totalCash = data['total_amount'] ?? 0.0;
+          // Flask tarafındaki anahtar kelimenin 'total_amount' olduğundan emin ol
+          _totalCash = (data['total_amount'] ?? 0.0).toDouble();
           _isLoading = false;
         });
       } else {
         setState(() {
-          _errorMessage = 'API bağlantı hatası: ${response.statusCode}';
+          _errorMessage = 'Sunucu Hatası: ${response.statusCode}';
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Bağlantı kurulamadı. Flask API çalışıyor mu? Hata: $e';
+        _errorMessage = 'Bağlantı Başarısız: Sunucuya ulaşılamıyor.\nHata: $e';
         _isLoading = false;
       });
     }
@@ -66,7 +65,7 @@ class _CashierScreenState extends State<CashierScreen> {
           '💵 Kasa Toplamı',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFFe74c3c), // Kırmızımsı ton (Para için)
+        backgroundColor: const Color(0xFFe74c3c),
         foregroundColor: Colors.white,
       ),
       body: Center(
@@ -79,9 +78,13 @@ class _CashierScreenState extends State<CashierScreen> {
               if (_isLoading)
                 const CircularProgressIndicator()
               else if (_errorMessage.isNotEmpty)
-                Text(
-                  _errorMessage,
-                  style: const TextStyle(color: Colors.red, fontSize: 16),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    _errorMessage,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                  ),
                 )
               else ...[
                 const Text(
@@ -90,11 +93,11 @@ class _CashierScreenState extends State<CashierScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  '${_totalCash.toStringAsFixed(2)} TL', // 2 ondalık basamak göster
+                  '${_totalCash.toStringAsFixed(2)} TL',
                   style: const TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF2ecc71), // Yeşil renk (Başarı/Gelir)
+                    color: Color(0xFF2ecc71),
                   ),
                 ),
               ],
