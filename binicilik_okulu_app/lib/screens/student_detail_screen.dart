@@ -4,7 +4,8 @@ import 'dart:convert';
 
 class StudentDetailScreen extends StatefulWidget {
   final int studentIndex;
-  final String apiUrlBase;
+  final String
+  apiUrlBase; // Bu değer 'https://.../api/students/' şeklinde gelmeli
 
   const StudentDetailScreen({
     super.key,
@@ -27,17 +28,25 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
     _fetchDetail();
   }
 
-  // ---------------------------------------------------------------------
-  // API FONKSİYONLARI (GET, POST, DELETE)
-  // ---------------------------------------------------------------------
+  // URL'nin sonuna / eklenip eklenmediğini kontrol eden yardımcı fonksiyon
+  String _getFormattedUrl() {
+    String base = widget.apiUrlBase;
+    if (!base.endsWith('/')) {
+      base = '$base/';
+    }
+    return '$base${widget.studentIndex}';
+  }
 
-  // Detayları Çek
+  // 1. Detayları Çek (GET) - URL Düzeltildi
   Future<void> _fetchDetail() async {
     setState(() {
       _isLoading = true;
       _error = '';
     });
-    final url = Uri.parse('${widget.apiUrlBase}${widget.studentIndex}');
+
+    // URL birleştirme hatası giderildi: / işareti eklendi
+    final url = Uri.parse(_getFormattedUrl());
+
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -59,15 +68,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
     }
   }
 
-  // Talep: Kredi Düşürme (Ders İşle)
+  // 2. Kredi Düşürme (POST) - URL Düzeltildi
   Future<void> _decreaseCredit() async {
-    final url = Uri.parse(
-      '${widget.apiUrlBase}${widget.studentIndex}/decrease-credit',
-    );
+    final url = Uri.parse('${_getFormattedUrl()}/decrease-credit');
     try {
       final response = await http.post(url);
       if (response.statusCode == 200) {
-        _fetchDetail(); // Veriyi güncelle
+        _fetchDetail();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('✅ Ders işlendi, kredi düştü.')),
         );
@@ -79,15 +86,13 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
     }
   }
 
-  // Talep: Ödeme Durumu Güncelleme
+  // 3. Ödeme Durumu Güncelleme (POST) - URL Düzeltildi
   Future<void> _markAsPaid() async {
-    final url = Uri.parse(
-      '${widget.apiUrlBase}${widget.studentIndex}/mark-paid',
-    );
+    final url = Uri.parse('${_getFormattedUrl()}/mark-paid');
     try {
       final response = await http.post(url);
       if (response.statusCode == 200) {
-        _fetchDetail(); // Veriyi güncelle
+        _fetchDetail();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('✅ Ödeme durumu güncellendi.')),
         );
@@ -99,9 +104,9 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
     }
   }
 
-  // Silme İşlemi
+  // 4. Silme İşlemi (DELETE) - URL Düzeltildi
   Future<void> _deleteStudent() async {
-    final url = Uri.parse('${widget.apiUrlBase}${widget.studentIndex}');
+    final url = Uri.parse(_getFormattedUrl());
     try {
       final response = await http.delete(url);
       if (response.statusCode == 200) {
@@ -116,6 +121,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
       ).showSnackBar(const SnackBar(content: Text('❌ Silme başarısız.')));
     }
   }
+
+  // ... (Geri kalan UI/Tasarım kodların aynı kalabilir) ...
 
   void _showDeleteDialog() {
     showDialog(
@@ -140,10 +147,6 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
       ),
     );
   }
-
-  // ---------------------------------------------------------------------
-  // TASARIM (WIDGETS)
-  // ---------------------------------------------------------------------
 
   Widget _buildDetailRow(
     String label,
@@ -183,8 +186,8 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    int credits = _studentData?['lesson_credits'] ?? 8; //
-    String paymentStatus = _studentData?['payment_status'] ?? "Ödenmedi"; //
+    int credits = _studentData?['lesson_credits'] ?? 8;
+    String paymentStatus = _studentData?['payment_status'] ?? "Ödenmedi";
 
     return Scaffold(
       appBar: AppBar(
@@ -202,15 +205,24 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _error.isNotEmpty
           ? Center(
-              child: Text(
-                'Hata: $_error',
-                style: const TextStyle(color: Colors.red),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Hata: $_error',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _fetchDetail,
+                    child: const Text("Tekrar Dene"),
+                  ),
+                ],
               ),
             )
           : SingleChildScrollView(
               child: Column(
                 children: [
-                  // Talep: Kredi bitince öğretmen bildirimi
                   if (credits == 0)
                     Container(
                       width: double.infinity,
@@ -225,7 +237,6 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
                         ),
                       ),
                     ),
-
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Card(
@@ -249,8 +260,6 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
                               ),
                             ),
                             const Divider(height: 30),
-
-                            // Talep: Sabit Ders Saati Gösterimi
                             _buildDetailRow(
                               'Sabit Ders Saati',
                               _studentData!['lesson_schedule'] ??
@@ -262,10 +271,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
                               _studentData!['veli_telefon'] ?? 'Yok',
                               Icons.phone,
                             ),
-
                             const Divider(),
-
-                            // KREDİ BÖLÜMÜ
                             Center(
                               child: Column(
                                 children: [
@@ -298,10 +304,7 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
                                 ],
                               ),
                             ),
-
                             const Divider(),
-
-                            // ÖDEME BÖLÜMÜ
                             _buildDetailRow(
                               'Ödeme Durumu',
                               paymentStatus,
@@ -320,7 +323,6 @@ class _StudentDetailScreenState extends State<StudentDetailScreen> {
                                   ),
                                 ),
                               ),
-
                             const Divider(),
                             _buildDetailRow(
                               'Ödenen Tutar',
